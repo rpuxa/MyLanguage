@@ -17,6 +17,9 @@ class ConstantPool : ByteCodeWritable {
 
     val objectClassName by lazy { Utf8Type("java/lang/Object", this) }
     val objectClass by lazy { ClassType(objectClassName, this) }
+    val codeAttribute by lazy { Utf8Type("Code", this) }
+    val lineNumberTableAttribute by lazy { Utf8Type("LineNumberTable", this) }
+    val localVariableTableAttribute by lazy { Utf8Type("LocalVariableTable", this) }
 
     override fun write(output: ByteCodeStream) {
         output.write2(entries.size + 1)

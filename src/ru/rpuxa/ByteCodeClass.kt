@@ -31,7 +31,7 @@ class ByteCodeClass(
         output.write2(fields.size)
         fields.forEach(output::write)
         output.write2(methods.size)
-        //TODO
+        methods.forEach(output::write)
         output.write2(0)
     }
 }
