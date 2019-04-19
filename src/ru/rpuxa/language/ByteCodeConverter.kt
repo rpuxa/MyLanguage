@@ -7,8 +7,8 @@ import ru.rpuxa.constantpool.ByteCodeStream
 import ru.rpuxa.constantpool.ConstantPool
 import ru.rpuxa.instructions.InstructionTypes
 import ru.rpuxa.language.elements.Element
-import ru.rpuxa.language.elements.operators.Assignment
-import ru.rpuxa.language.elements.operators.ByteCodeOperator
+import ru.rpuxa.language.elements.specialsymbols.operators.Assignment
+import ru.rpuxa.language.elements.specialsymbols.operators.ByteCodeOperator
 import java.io.DataOutputStream
 import java.io.FileOutputStream
 import kotlin.test.fail
