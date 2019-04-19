@@ -12,7 +12,7 @@ class ByteCodeClass(
     val major: Int = 53,
     val constantPool: ConstantPool = ConstantPool(),
     val accessFlags: Array<AccessFlags> = arrayOf(AccessFlags.PUBLIC),
-    val thisClass: ClassType = ClassType(Utf8Type("MyLanguageClass", constantPool), constantPool),
+    val thisClass: ClassType = ClassType(Utf8Type("MyLanguage", constantPool), constantPool),
     val superClass: ClassType = constantPool.objectClass,
     val interfaces: Array<ClassType> = emptyArray(),
     val fields: Array<ByteCodeField> = emptyArray(),

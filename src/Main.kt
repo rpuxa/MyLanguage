@@ -7,12 +7,15 @@ import ru.rpuxa.instructions.InstructionTypes
 import java.io.DataOutputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import kotlin.concurrent.thread
 
 fun main(args: Array<String>) {
-     write()
+    write()
 }
 
+
 fun read() {
+
     println()
 
     var i = 0
@@ -33,22 +36,39 @@ fun read() {
 
 fun write() {
     val pool = ConstantPool()
-    val num1 = IntegerType(1488, pool)
-    val num2 = IntegerType(228, pool)
+
 
     val byteCode = ByteCodeClass(
         constantPool = pool
-                , methods = arrayOf(ByteCodeMethod(
-            accessFlags = arrayOf(AccessFlags.STATIC, AccessFlags.PUBLIC),
-            name = Utf8Type("myMethod", pool),
-            descriptor = Utf8Type("()I", pool),
-            code = CodeAttribute(pool, arrayOf(
-                Instruction(InstructionTypes.LDC_W, num1),
-                Instruction(InstructionTypes.LDC_W, num2),
-                Instruction(InstructionTypes.IDIV),
-                Instruction(InstructionTypes.IRETURN)
-            ))
-        ))
+        , methods = arrayOf(
+            ByteCodeMethod(
+                accessFlags = arrayOf(AccessFlags.STATIC, AccessFlags.PUBLIC),
+                name = Utf8Type("main", pool),
+                descriptor = Utf8Type("([Ljava/lang/String;)V", pool),
+                code = CodeAttribute(
+                    pool, arrayOf(
+                        Instruction(
+                            InstructionTypes.GETSTATIC,
+                            FieldType(
+                                ClassType(Utf8Type("java/lang/System", pool), pool),
+                                NameAndType(Utf8Type("out", pool), Utf8Type("Ljava/io/PrintStream;", pool), pool),
+                                pool
+                            )
+                        ),
+                        Instruction(InstructionTypes.LDC_W, StringType(Utf8Type("Hello, World!", pool), pool)),
+                        Instruction(
+                            InstructionTypes.INVOKEVIRTUAL,
+                            MethodRefType(
+                                ClassType(Utf8Type("java/io/PrintStream", pool), pool),
+                                NameAndType(Utf8Type("println", pool), Utf8Type("(Ljava/lang/String;)V", pool), pool),
+                                pool
+                            )
+                        ),
+                        Instruction(InstructionTypes.RETURN)
+                    )
+                )
+            )
+        )
     )
 
     FileOutputStream("MyLanguage.class").use {

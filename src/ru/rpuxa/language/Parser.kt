@@ -2,6 +2,8 @@ package ru.rpuxa.language
 
 import ru.rpuxa.language.elements.Element
 import ru.rpuxa.language.elements.IntegerElement
+import ru.rpuxa.language.elements.operators.Assignment
+import ru.rpuxa.language.elements.operators.ByteCodeOperator
 import ru.rpuxa.language.elements.operators.MethodOperator
 import ru.rpuxa.language.elements.operators.Operator
 import ru.rpuxa.language.elements.specialsymbols.ClosedRoundBracket
@@ -56,8 +58,22 @@ object Parser {
     }
 
     private fun parse2(list: List<Element>): List<Element> {
+        var list = list
         val result = Stack<Element>()
         val operators = Stack<Element>()
+        val newList = ArrayList<Element>()
+        var last: Element? = null
+        for (e in list) {
+            if (last is Word && e is Assignment) {
+                newList.removeAt(newList.lastIndex)
+                newList.add(ByteCodeOperator(e, last))
+            } else {
+                newList.add(e)
+            }
+            last = e
+        }
+        list = newList
+
         f@ for ((i, e) in list.withIndex()) {
             val element = if (e is Word && i < list.lastIndex && list[i + 1] == OpenedRoundBracket) {
                 MethodOperator(e.string)
