@@ -1,12 +1,11 @@
 package ru.rpuxa.language.elements.specialsymbols.operators
 
 import ru.rpuxa.language.ElementsSequence
-import ru.rpuxa.language.code.LCode
-import ru.rpuxa.language.code.LExpression
-import kotlin.test.fail
+import ru.rpuxa.language.code.Code
+import ru.rpuxa.language.code.Expression
 
-abstract class PostfixOperator(symbols: String) : Operator(symbols) {
-    override fun parse(code: LCode, sequence: ElementsSequence, expression: LExpression) {
+abstract class PostfixOperator(symbols: String, priority: Int) : Operator(symbols, priority) {
+    override fun parse(code: Code, sequence: ElementsSequence, expression: Expression) {
         expression.outStack.push(this)
     }
 }

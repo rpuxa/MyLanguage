@@ -4,7 +4,7 @@ import ru.rpuxa.language.elements.Element
 
 abstract class Keyword(val name: String) : Element {
     companion object {
-        @JvmField
-        val ALL = arrayOf(If)
+        /*      @JvmField
+              val ALL = arrayOf(If)*/
     }
 }

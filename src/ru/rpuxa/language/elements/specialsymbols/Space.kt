@@ -1,3 +1,14 @@
 package ru.rpuxa.language.elements.specialsymbols
 
-object Space : SpecialSymbols(" ")
+import ru.rpuxa.language.ElementsSequence
+import ru.rpuxa.language.code.Code
+import kotlin.test.fail
+
+object Space : SpecialSymbols(" "), SpecialSymbolInstance {
+
+    override fun getNewInstance() = this
+
+    override fun parse(code: Code, sequence: ElementsSequence) {
+        fail()
+    }
+}

@@ -9,7 +9,7 @@ import ru.rpuxa.constantpool.types.Utf8Type
 
 class ByteCodeClass(
     val minor: Int = 0,
-    val major: Int = 53,
+    val major: Int = 52,
     val constantPool: ConstantPool = ConstantPool(),
     val accessFlags: Array<AccessFlags> = arrayOf(AccessFlags.PUBLIC),
     val thisClass: ClassType = ClassType(Utf8Type("MyLanguage", constantPool), constantPool),

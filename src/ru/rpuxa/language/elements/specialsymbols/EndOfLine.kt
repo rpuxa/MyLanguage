@@ -1,10 +1,12 @@
 package ru.rpuxa.language.elements.specialsymbols
 
 import ru.rpuxa.language.ElementsSequence
-import ru.rpuxa.language.code.LCode
+import ru.rpuxa.language.code.Code
 
-object EndOfLine : SpecialSymbols("\n") {
-    override fun parse(code: LCode, sequence: ElementsSequence) {
-        code.currentMethod?.block?.expression?.pack()
+object EndOfLine : SpecialSymbols("\n"), SpecialSymbolInstance {
+
+    override fun getNewInstance() = this
+    override fun parse(code: Code, sequence: ElementsSequence) {
+        code.currentMethod?.block?.innerBlock?.startNewExpression()
     }
 }

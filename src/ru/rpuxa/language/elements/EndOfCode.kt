@@ -1,10 +1,10 @@
 package ru.rpuxa.language.elements
 
 import ru.rpuxa.language.ElementsSequence
-import ru.rpuxa.language.code.LCode
+import ru.rpuxa.language.code.Code
 
-object EndOfCode : Element {
-    override fun parse(code: LCode, sequence: ElementsSequence) {
+object EndOfCode : CodeElement {
+    override fun parse(code: Code, sequence: ElementsSequence) {
         code.pack()
     }
 }

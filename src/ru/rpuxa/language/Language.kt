@@ -1,33 +1,53 @@
 package ru.rpuxa.language
 
-import ru.rpuxa.language.elements.Element
-import ru.rpuxa.language.elements.EndOfCode
-import ru.rpuxa.language.elements.Word
+import ru.rpuxa.*
+import ru.rpuxa.clazz.AccessFlags
+import ru.rpuxa.constantpool.ByteCodeStream
+import ru.rpuxa.constantpool.ConstantPool
+import ru.rpuxa.constantpool.types.ClassType
+import ru.rpuxa.constantpool.types.Utf8Type
+import ru.rpuxa.instructions.InstructionTypes
+import ru.rpuxa.language.code.Code
+import ru.rpuxa.language.code.Method
+import ru.rpuxa.language.elements.*
+import ru.rpuxa.language.elements.literals.StringLiteral
 import ru.rpuxa.language.elements.specialsymbols.Space
 import ru.rpuxa.language.elements.specialsymbols.SpecialSymbols
-import java.io.FileReader
-import java.util.*
-import kotlin.collections.ArrayList
+import java.io.*
 
 
-object Parser {
-    fun read(): String {
-        val i = Scanner(FileReader("code.txt"))
+object Language {
+
+    const val CLASS_NAME = "MyLanguageClass"
+
+    private fun read(): String {
+        val i = BufferedReader(InputStreamReader(FileInputStream("code.txt")))
         val sb = StringBuilder()
-        while (i.hasNext()) {
-            sb.append(i.next())
+        while (true) {
+            val readLine = i.readLine() ?: break
+            sb.append(readLine).append('\n')
         }
         i.close()
         return sb.toString()
     }
 
-    fun toElementsSequence(code: String): ElementsSequence {
-        var list = mutableListOf<Element>(Word(code))
+    private fun stringToElementsSequence(code: String): ElementsSequence {
+        //string literals
+        var list = ArrayList<CodeElement>()
+        code.split('\"').forEachIndexed { index, s ->
+            list.add(
+                if (index % 2 == 0)
+                    Word(s)
+                else
+                    StringLiteral(s)
+            )
+        }
         for (symbol in SpecialSymbols.ALL) {
-            val splitList = ArrayList<Element>()
+            val splitList = ArrayList<CodeElement>()
             for (element in list)
                 if (element is Word) {
-                    val split = element.value.split(symbol.symbols).flatMap { listOf(Word(it), element) }
+                    val split = element.value.split(symbol.getNewInstance().symbols)
+                        .flatMap { listOf(Word(it), symbol.getNewInstance()) }
                     repeat(split.size - 1) {
                         splitList += split[it]
                     }
@@ -44,6 +64,71 @@ object Parser {
                 .filterNot { it is Space }
                 .map { if (it is Word) Word(it.value.trim()) else it }
                 .toList()
+        )
+    }
+
+    fun elementSequenceToCode(sequence: ElementsSequence): Code {
+        val code = Code()
+        code.currentMethod = Method(code, "main").apply {
+            arguments = arrayOf(STRING_ARRAY_TYPE)
+        }
+        while (sequence.hasNext()) {
+            sequence.currentElement.parse(code, sequence)
+            sequence.moveToNext()
+        }
+
+        return code
+    }
+
+    fun codeToByteCode(code: Code): ByteCodeClass {
+        val pool = ConstantPool()
+        val methods = ArrayList<ByteCodeMethod>()
+        for (method in code.methods) {
+            var instructions = method.block.beginElement.toByteCode(pool, method.block)
+            val commands = arrayOf("LOAD", "STORE")
+            instructions = instructions.map { instruction ->
+                for (command in commands) {
+                    val arg = instruction.args.firstOrNull()
+                    if (instruction.type.name.endsWith(command) && arg is OneByteInstructionArgument && arg.value in 0..3) {
+                        val type =
+                            InstructionTypes.values().find { it.name == "${instruction.type.name}_${arg.value}" }!!
+                        return@map Instruction(type)
+                    }
+                }
+                instruction
+            }
+            if (method.returnType === VOID_TYPE)
+                instructions += Instruction(InstructionTypes.RETURN)
+
+            methods.add(
+                ByteCodeMethod(
+                    accessFlags = arrayOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+                    name = Utf8Type(method.name, pool),
+                    descriptor = Utf8Type(method.getDescriptor(), pool),
+                    code = CodeAttribute(
+                        pool = pool,
+                        instructions = instructions.toTypedArray()
+                    )
+                )
+            )
+        }
+
+        return ByteCodeClass(
+            constantPool = pool,
+            accessFlags = arrayOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
+            thisClass = ClassType(Utf8Type(CLASS_NAME, pool), pool),
+            methods = methods.toTypedArray()
+        )
+    }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val source = read()
+        val sequence = stringToElementsSequence(source)
+        val code = elementSequenceToCode(sequence)
+        val byteCode = codeToByteCode(code)
+        byteCode.write(
+            ByteCodeStream(DataOutputStream(FileOutputStream("$CLASS_NAME.class")))
         )
     }
 

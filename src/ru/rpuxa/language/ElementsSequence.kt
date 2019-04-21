@@ -1,8 +1,9 @@
 package ru.rpuxa.language
 
+import ru.rpuxa.language.elements.CodeElement
 import ru.rpuxa.language.elements.Element
 
-class ElementsSequence(elements: List<Element>) {
+class ElementsSequence(elements: List<CodeElement>) {
     private val list = elements.toMutableList()
     private var current = 0
     private var next = 1
@@ -17,15 +18,24 @@ class ElementsSequence(elements: List<Element>) {
         next += i
     }
 
-    fun replace(element: Element) {
+    fun replace(element: CodeElement) {
         list.removeAt(current)
         list.add(current, element)
     }
 
     inline fun <reified T : Element> nextIs() = next() as? T
 
-    fun replaceAndRepeat(element: Element) {
+    fun replaceAndRepeat(element: CodeElement) {
         replace(element)
         next = current
     }
+
+    val currentElement get() = list[current]
+
+    fun moveToNext() {
+        current = next
+        next = current + 1
+    }
+
+    fun hasNext() = current < list.size
 }
