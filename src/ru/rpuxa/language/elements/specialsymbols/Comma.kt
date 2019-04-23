@@ -11,7 +11,7 @@ import ru.rpuxa.language.elements.specialsymbols.brakets.OpenedRoundBracket
 import java.util.*
 import kotlin.test.fail
 
-object Comma : SpecialSymbols(","), ExpressionElement, SpecialSymbolInstance {
+object Comma : SpecialSymbols(","), ExpressionElement, SpecialSymbolFactory {
 
     override fun getNewInstance() = this
     override fun parse(code: Code, sequence: ElementsSequence) {

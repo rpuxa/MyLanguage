@@ -19,6 +19,10 @@ import java.io.*
 object Language {
 
     const val CLASS_NAME = "MyLanguageClass"
+    const val INPUT_METHOD_NAME = "$\$input$$"
+    const val INPUT_METHOD_DESCRIPTOR = "()$STRING"
+    const val SCANNER_FIELD_NAME = "$\$scanner$$"
+    const val SCANNER_FIELD_DESCRIPTOR = ""
 
     private fun read(): String {
         val i = BufferedReader(InputStreamReader(FileInputStream("code.txt")))
@@ -110,6 +114,24 @@ object Language {
                         instructions = instructions.toTypedArray()
                     )
                 )
+            )
+        }
+
+        val fields = ArrayList<ByteCodeField>()
+
+        if (code.generateInputMethod) {
+            fields += ByteCodeField(
+                arrayOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+                Utf8Type(SCANNER_FIELD_NAME, pool),
+                Utf8Type()
+            )
+            methods += ByteCodeMethod(
+                accessFlags = arrayOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+                name = Utf8Type(INPUT_METHOD_NAME, pool),
+                descriptor = Utf8Type(INPUT_METHOD_DESCRIPTOR, pool),
+                code = CodeAttribute(pool, arrayOf(
+
+                ))
             )
         }
 

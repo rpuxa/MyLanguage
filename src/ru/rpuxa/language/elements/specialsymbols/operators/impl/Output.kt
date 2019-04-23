@@ -1,4 +1,4 @@
-package ru.rpuxa.language.elements.specialsymbols.operators
+package ru.rpuxa.language.elements.specialsymbols.operators.impl
 
 import ru.rpuxa.Instruction
 import ru.rpuxa.OneByteInstructionArgument
@@ -9,7 +9,8 @@ import ru.rpuxa.language.code.Code
 import ru.rpuxa.language.code.Expression
 import ru.rpuxa.language.elements.Type
 import ru.rpuxa.language.elements.getInstructionFromType
-import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolInstance
+import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolFactory
+import ru.rpuxa.language.elements.specialsymbols.operators.RightAssociativeOperator
 import java.util.*
 
 class Output : RightAssociativeOperator("<<", -100) {
@@ -67,7 +68,7 @@ class Output : RightAssociativeOperator("<<", -100) {
         return instructions
     }
 
-    companion object : SpecialSymbolInstance {
+    companion object : SpecialSymbolFactory {
         override fun getNewInstance() = Output()
     }
 }

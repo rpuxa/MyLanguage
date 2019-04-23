@@ -6,7 +6,7 @@ import ru.rpuxa.language.code.Method
 import ru.rpuxa.language.elements.Word
 import kotlin.test.fail
 
-object MethodDeclaration : SpecialSymbols(":"), SpecialSymbolInstance {
+object MethodDeclaration : SpecialSymbols(":"), SpecialSymbolFactory {
 
     override fun getNewInstance() = this
     override fun parse(code: Code, sequence: ElementsSequence) {

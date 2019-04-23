@@ -16,6 +16,10 @@ val STRING_ARRAY_TYPE = object : Type {
     override fun getTypeDescriptor(code: Code) = "[$STRING"
 }
 
+val INTEGER_TYPE = object : Type {
+    override fun getTypeDescriptor(code: Code) = INTEGER
+}
+
 fun getInstructionPrefixFromType(type: Type, code: Code) = when (type.getTypeDescriptor(code)) {
     INTEGER -> INTEGER
     VOID -> fail()

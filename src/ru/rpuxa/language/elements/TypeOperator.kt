@@ -1,6 +1,12 @@
 package ru.rpuxa.language.elements
 
+import ru.rpuxa.language.code.Code
+
 interface TypeOperator {
 
-    fun deriveType(first: Type, second: Type): Type
+    fun deriveType(
+        code: Code,
+        first: Type,
+        second: Type
+    ): Type
 }

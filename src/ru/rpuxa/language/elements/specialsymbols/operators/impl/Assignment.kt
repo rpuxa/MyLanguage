@@ -1,4 +1,4 @@
-package ru.rpuxa.language.elements.specialsymbols.operators
+package ru.rpuxa.language.elements.specialsymbols.operators.impl
 
 import ru.rpuxa.Instruction
 import ru.rpuxa.OneByteInstructionArgument
@@ -10,11 +10,12 @@ import ru.rpuxa.language.code.Code
 import ru.rpuxa.language.code.Expression
 import ru.rpuxa.language.elements.Type
 import ru.rpuxa.language.elements.getInstructionFromType
-import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolInstance
+import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolFactory
+import ru.rpuxa.language.elements.specialsymbols.operators.RightAssociativeOperator
 import java.util.*
 import kotlin.test.fail
 
-object Assignment : RightAssociativeOperator("=", -100), SpecialSymbolInstance {
+object Assignment : RightAssociativeOperator("=", -100), SpecialSymbolFactory {
 
     override fun getNewInstance() = this
     override fun replaceStack(

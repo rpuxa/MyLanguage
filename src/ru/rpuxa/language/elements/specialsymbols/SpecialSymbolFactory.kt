@@ -1,5 +1,5 @@
 package ru.rpuxa.language.elements.specialsymbols
 
-interface SpecialSymbolInstance {
+interface SpecialSymbolFactory {
     fun getNewInstance(): SpecialSymbols
 }

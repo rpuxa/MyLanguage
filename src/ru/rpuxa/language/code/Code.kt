@@ -9,6 +9,8 @@ class Code {
 
     var currentMethod: Method? = null
 
+    var generateInputMethod = false
+
     fun pack() {
         currentMethod?.pack()
         methods.forEach { method ->

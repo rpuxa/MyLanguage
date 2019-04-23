@@ -7,12 +7,12 @@ import ru.rpuxa.language.code.Code
 import ru.rpuxa.language.code.Expression
 import ru.rpuxa.language.elements.ExpressionElement
 import ru.rpuxa.language.elements.Type
-import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolInstance
+import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolFactory
 import ru.rpuxa.language.elements.specialsymbols.SpecialSymbols
 import java.util.*
 import kotlin.test.fail
 
-object OpenedRoundBracket : SpecialSymbols("("), ExpressionElement, SpecialSymbolInstance {
+object OpenedRoundBracket : SpecialSymbols("("), ExpressionElement, SpecialSymbolFactory {
 
     override fun getNewInstance() = this
     override fun parse(code: Code, sequence: ElementsSequence) {

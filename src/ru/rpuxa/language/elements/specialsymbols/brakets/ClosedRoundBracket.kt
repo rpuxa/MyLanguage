@@ -4,11 +4,11 @@ import ru.rpuxa.language.ElementsSequence
 import ru.rpuxa.language.code.Code
 import ru.rpuxa.language.elements.MethodInvocation
 import ru.rpuxa.language.elements.specialsymbols.Comma
-import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolInstance
+import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolFactory
 import ru.rpuxa.language.elements.specialsymbols.SpecialSymbols
 import kotlin.test.fail
 
-object ClosedRoundBracket : SpecialSymbols(")"), SpecialSymbolInstance {
+object ClosedRoundBracket : SpecialSymbols(")"), SpecialSymbolFactory {
 
     override fun getNewInstance() = this
     override fun parse(code: Code, sequence: ElementsSequence) {
