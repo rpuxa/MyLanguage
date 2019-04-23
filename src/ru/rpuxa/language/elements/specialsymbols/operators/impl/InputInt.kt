@@ -3,10 +3,7 @@ package ru.rpuxa.language.elements.specialsymbols.operators.impl
 import ru.rpuxa.Instruction
 import ru.rpuxa.OneByteInstructionArgument
 import ru.rpuxa.constantpool.ConstantPool
-import ru.rpuxa.constantpool.types.ClassType
-import ru.rpuxa.constantpool.types.MethodRefType
-import ru.rpuxa.constantpool.types.NameAndType
-import ru.rpuxa.constantpool.types.Utf8Type
+import ru.rpuxa.constantpool.types.*
 import ru.rpuxa.instructions.InstructionTypes
 import ru.rpuxa.language.ElementsSequence
 import ru.rpuxa.language.Language
@@ -14,12 +11,9 @@ import ru.rpuxa.language.Variable
 import ru.rpuxa.language.code.Code
 import ru.rpuxa.language.code.Expression
 import ru.rpuxa.language.elements.INTEGER_TYPE
-import ru.rpuxa.language.elements.STRING
 import ru.rpuxa.language.elements.Type
 import ru.rpuxa.language.elements.specialsymbols.SpecialSymbolFactory
-import ru.rpuxa.language.elements.specialsymbols.SpecialSymbols
 import ru.rpuxa.language.elements.specialsymbols.operators.PostfixOperator
-import ru.rpuxa.language.elements.specialsymbols.operators.RightAssociativeOperator
 import java.util.*
 import kotlin.test.fail
 
@@ -42,26 +36,22 @@ object InputInt : PostfixOperator(">>", 100), SpecialSymbolFactory {
         code.generateInputMethod = true
         return listOf(
             Instruction(
-                InstructionTypes.INVOKESTATIC,
-                MethodRefType(
+                InstructionTypes.GETSTATIC,
+                FieldType(
                     ClassType(Utf8Type(Language.CLASS_NAME, pool), pool),
                     NameAndType(
-                        Utf8Type(Language.INPUT_METHOD_NAME, pool),
-                        Utf8Type(Language.INPUT_METHOD_DESCRIPTOR, pool),
+                        Utf8Type(Language.SCANNER_FIELD_NAME, pool),
+                        Utf8Type(Language.SCANNER_FIELD_DESCRIPTOR, pool),
                         pool
                     ),
                     pool
                 )
             ),
             Instruction(
-                InstructionTypes.INVOKESTATIC,
+                InstructionTypes.INVOKEVIRTUAL,
                 MethodRefType(
-                    ClassType(pool.integerClassName, pool),
-                    NameAndType(
-                        Utf8Type("parseInt", pool),
-                        Utf8Type("($STRING)I", pool),
-                        pool
-                    ),
+                    ClassType(Utf8Type("java/util/Scanner", pool), pool),
+                    NameAndType(Utf8Type("nextInt", pool), Utf8Type("()I", pool), pool),
                     pool
                 )
             ),

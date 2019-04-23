@@ -4,8 +4,7 @@ import ru.rpuxa.*
 import ru.rpuxa.clazz.AccessFlags
 import ru.rpuxa.constantpool.ByteCodeStream
 import ru.rpuxa.constantpool.ConstantPool
-import ru.rpuxa.constantpool.types.ClassType
-import ru.rpuxa.constantpool.types.Utf8Type
+import ru.rpuxa.constantpool.types.*
 import ru.rpuxa.instructions.InstructionTypes
 import ru.rpuxa.language.code.Code
 import ru.rpuxa.language.code.Method
@@ -14,15 +13,14 @@ import ru.rpuxa.language.elements.literals.StringLiteral
 import ru.rpuxa.language.elements.specialsymbols.Space
 import ru.rpuxa.language.elements.specialsymbols.SpecialSymbols
 import java.io.*
+import java.util.*
 
 
 object Language {
 
     const val CLASS_NAME = "MyLanguageClass"
-    const val INPUT_METHOD_NAME = "$\$input$$"
-    const val INPUT_METHOD_DESCRIPTOR = "()$STRING"
-    const val SCANNER_FIELD_NAME = "$\$scanner$$"
-    const val SCANNER_FIELD_DESCRIPTOR = ""
+    const val SCANNER_FIELD_NAME = "scanner"
+    const val SCANNER_FIELD_DESCRIPTOR = "Ljava/util/Scanner;"
 
     private fun read(): String {
         val i = BufferedReader(InputStreamReader(FileInputStream("code.txt")))
@@ -73,9 +71,7 @@ object Language {
 
     fun elementSequenceToCode(sequence: ElementsSequence): Code {
         val code = Code()
-        code.currentMethod = Method(code, "main").apply {
-            arguments = arrayOf(STRING_ARRAY_TYPE)
-        }
+        code.currentMethod = Method(code, "main")
         while (sequence.hasNext()) {
             sequence.currentElement.parse(code, sequence)
             sequence.moveToNext()
@@ -87,6 +83,8 @@ object Language {
     fun codeToByteCode(code: Code): ByteCodeClass {
         val pool = ConstantPool()
         val methods = ArrayList<ByteCodeMethod>()
+        val fields = ArrayList<ByteCodeField>()
+        val staticInitInstructions = ArrayList<Instruction>()
         for (method in code.methods) {
             var instructions = method.block.beginElement.toByteCode(pool, method.block)
             val commands = arrayOf("LOAD", "STORE")
@@ -117,21 +115,78 @@ object Language {
             )
         }
 
-        val fields = ArrayList<ByteCodeField>()
-
         if (code.generateInputMethod) {
             fields += ByteCodeField(
                 arrayOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
                 Utf8Type(SCANNER_FIELD_NAME, pool),
-                Utf8Type()
+                Utf8Type(SCANNER_FIELD_DESCRIPTOR, pool)
             )
-            methods += ByteCodeMethod(
-                accessFlags = arrayOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
-                name = Utf8Type(INPUT_METHOD_NAME, pool),
-                descriptor = Utf8Type(INPUT_METHOD_DESCRIPTOR, pool),
-                code = CodeAttribute(pool, arrayOf(
 
-                ))
+
+            val scannerClass = ClassType(Utf8Type("java/util/Scanner", pool), pool)
+            staticInitInstructions += listOf(
+                Instruction(InstructionTypes.NEW, scannerClass),
+                Instruction(InstructionTypes.DUP),
+                Instruction(
+                    InstructionTypes.GETSTATIC,
+                    FieldType(
+                        ClassType(Utf8Type("java/lang/System", pool), pool),
+                        NameAndType(Utf8Type("in", pool), Utf8Type("Ljava/io/InputStream;", pool), pool),
+                        pool
+                    )
+                ),
+                Instruction(
+                    InstructionTypes.INVOKESPECIAL, MethodRefType(
+                        scannerClass,
+                        NameAndType(
+                            Utf8Type("<init>", pool),
+                            Utf8Type("(Ljava/io/InputStream;)V", pool),
+                            pool
+                        ),
+                        pool
+                    )
+                ),
+                Instruction(
+                    InstructionTypes.PUTSTATIC,
+                    FieldType(
+                        ClassType(Utf8Type(CLASS_NAME, pool), pool),
+                        NameAndType(Utf8Type(SCANNER_FIELD_NAME, pool), Utf8Type(SCANNER_FIELD_DESCRIPTOR, pool), pool),
+                        pool
+                    )
+                )
+            )
+        }
+
+        methods += ByteCodeMethod(
+            arrayOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+            Utf8Type("main", pool),
+            Utf8Type("([$STRING)V", pool),
+            code = CodeAttribute(
+                pool, arrayOf(
+                    Instruction(
+                        InstructionTypes.INVOKESTATIC, MethodRefType(
+                            ClassType(Utf8Type(CLASS_NAME, pool), pool),
+                            NameAndType(Utf8Type("main", pool), Utf8Type("()V", pool), pool),
+                            pool
+                        )
+                    ),
+                    Instruction(InstructionTypes.RETURN)
+                )
+            )
+        )
+
+
+        if (staticInitInstructions.isNotEmpty()) {
+            methods.add(
+                0,
+                ByteCodeMethod(
+                    arrayOf(AccessFlags.STATIC),
+                    Utf8Type("<clinit>", pool),
+                    Utf8Type("()V", pool),
+                    CodeAttribute(
+                        pool, arrayOf(*staticInitInstructions.toTypedArray(), Instruction(InstructionTypes.RETURN))
+                    )
+                )
             )
         }
 
@@ -139,6 +194,7 @@ object Language {
             constantPool = pool,
             accessFlags = arrayOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
             thisClass = ClassType(Utf8Type(CLASS_NAME, pool), pool),
+            fields = fields.toTypedArray(),
             methods = methods.toTypedArray()
         )
     }

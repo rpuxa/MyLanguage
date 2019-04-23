@@ -1,2 +1,6 @@
+<< "Enter first number"
 a >>
-<< a
+<< "Enter second number"
+b >>
+<< "Sum of numbers: "
+<< a + b
